@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Создайте HTML-страницу с элементами: изображение, имя фотографа, кнопка "лайк" и счетчик лайков.
+    • Используя JavaScript и ваш API-ключ, получите случайное изображение из Unsplash каждый раз, когда пользователь загружает страницу.
+    • Отобразите информацию о фотографе под изображением.
+    • Реализуйте функционал "лайка". Каждый раз, когда пользователь нажимает кнопку "лайк", счетчик должен увеличиваться на единицу. -->
+    <div class="container">
+      <img
+        class="image"
+        src=""
+        alt="Picture"
+        style="height: 500px; width: 500px"
+      />
+      <p class="photographer"></p>
+      <button class="likeButton">Like</button>
+      <p class="count">Likes: 0</p>
+    </div>
+    <script>
+      const url =
+        'https://api.unsplash.com/photos/random/?client_id=f40PpYiEAxfEzy89K26-OLyPPVbnnihl1RJJT_3hizc'
+      const storageKey = 'lastLoadedTimestamp'
+      const storageKeyPrevImage = 'prevImageUrl'
+
+      const imageElement = document.querySelector('.image')
+      const photographerElement = document.querySelector('.photographer')
+      const likeButton = document.querySelector('.likeButton')
+      const likeCountElement = document.querySelector('.count')
+
+      let likeCount = 0
+
+      likeButton.addEventListener('click', () => {
+        likeCount++
+        likeCountElement.innerText = `Likes: ${likeCount}`
+      })
+
+      function fetchRandomImage() {
+        const lastTimes = localStorage.getItem(storageKey)
+        if (localStorage.getItem(storageKeyPrevImage) !== undefined) {
+          const prevImageUrl = localStorage.getItem(storageKeyPrevImage)
+        }
+
+        if (!lastTimes || Date.now() - parseInt(lastTimes) > 86400000) {
+          fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              const imageUrl = data.urls.regular
+
+              const photographerName = data.user.name
+
+              imageElement.src = imageUrl
+              photographerElement.innerText = `Photographer: ${photographerName}`
+
+              localStorage.setItem(storageKey, Date.now().toString())
+              localStorage.setItem(storageKeyPrevImage, imageUrl)
+            })
+            .catch(error => console.error('Error:', error))
+        } else {
+          const prevImageUrl = localStorage.getItem(storageKeyPrevImage)
+          if (prevImageUrl !== null) {
+            imageElement.src = prevImageUrl
+          }
+        }
+      }
+
+      fetchRandomImage()
+    </script>
+  </body>
+</html>
